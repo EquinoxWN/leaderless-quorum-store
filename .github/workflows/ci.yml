@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Least privilege: the workflow can read the code and nothing else.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Every action is pinned to a full commit SHA.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.26.10"
+          cache-dependency-path: go.mod
+      # lint, tests with the race detector, and the quorum overlap gate (prints a ::notice)
+      - run: make ci
+      - name: Three-process cluster over HTTP
+        run: |
+          bash scripts/demo.sh
+          echo "::notice::demo: 3 node processes; R=2 W=2 writes survive 1 node down and fail with 2 down; R=1 W=1 writes still succeed"
+      - name: Known-vulnerability audit
+        run: make audit
