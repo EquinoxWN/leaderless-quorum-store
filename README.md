@@ -82,7 +82,7 @@ Replicas keep data in memory.
 
 ## Run it
 
-Needs Go 1.23 or newer (CI uses 1.26.10). No third-party modules.
+Needs Go 1.23 or newer (CI uses 1.26.11). No third-party modules.
 
 ```bash
 go test -count=1 ./...                  # 44 tests (CI adds -race)
@@ -122,13 +122,13 @@ Latest local run (full detail in [docs/results/m1.md](docs/results/m1.md)):
 
 | Check | Result |
 |---|---|
-| Tests | 44 passed, 0 failed (`go test -count=1 ./...`, Go 1.26.10) |
+| Tests | 44 passed, 0 failed (`go test -count=1 ./...`, Go 1.26.11) |
 | Stale reads, R + W > N (21 settings at N=3 and N=5) | 0 in 2,000 trials each |
 | Stale reads, N=3 R=1 W=1 | 1349/2000 (0.674; theory 0.667) |
 | Stale reads, N=5 R=2 W=2 | 613/2000 (0.306; theory 0.300) |
 | Nodes down that writes / reads survive, N=5 R=3 W=3 | 2 / 2 |
 | Mutation check | 17 of 17 hand mutations killed |
-| govulncheck v1.8.0 | GO-2026-6859 in the Go 1.26.10 standard library (fixed in 1.26.11; clean with 1.26.11) |
+| govulncheck v1.8.0 | No vulnerabilities found (Go 1.26.11); any finding fails `scripts/vulncheck.sh` |
 
 Stale reads are measured with in-process faults (lost writes, down nodes), not network partitions.
 The race detector and all CI steps have not run yet. The 10 quality rules and the mutation check
